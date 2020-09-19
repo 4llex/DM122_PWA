@@ -60,9 +60,19 @@ async function networkFirst(request) {
       return cache.match('offline.html');
     }
 }
+
+async function cacheFirst(request) {
+    try {
+        const cache = await caches.open(cacheName);
+        const response = await cache.match(request);
+        return response || fetch(request);
+    } catch (error) {
+        return await fetch(request);
+    }
+}
   
 self.addEventListener('fetch', event => {
     console.log('[Service Worker] Fetch event...', event);
-    event.respondWith(networkFirst(event.request));
+    event.respondWith(cacheFirst(event.request));
 });
   
